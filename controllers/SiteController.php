@@ -125,4 +125,14 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    /**
+     * Index page for battleships game.
+     *
+     * @return string
+     */
+    public function actionBattleships()
+    {
+        return $this->render('battleships');
+    }
 }
