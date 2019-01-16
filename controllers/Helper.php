@@ -3,6 +3,8 @@
 
 namespace app\controllers;
 
+use app\models\Cell;
+
 class Helper
 {
 
@@ -202,6 +204,7 @@ class Helper
                 }
             }
         }
+        return null;
     }
 
     /**
@@ -230,5 +233,6 @@ class Helper
                 }
             }
         }
+        return null;
     }
 }
