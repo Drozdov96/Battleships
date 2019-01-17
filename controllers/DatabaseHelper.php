@@ -3,10 +3,11 @@
 namespace app\controllers;
 
 use \yii\db\Query;
+use app\models\Cell;
+
 
 class DatabaseHelper
 {
-
     /**
      * @param string $playerName
      * @return int
@@ -32,10 +33,11 @@ class DatabaseHelper
         return $id;
     }
 
+
     /**
      * @param int $idOne
      * @param int $idTwo
-     * @return bool
+     * @return mixed
      */
     public static function createGame(int $idOne, int $idTwo)
     {
@@ -105,12 +107,13 @@ class DatabaseHelper
         return $id;
     }
 
+
     /**
      * @param int $fieldId
      * @param int $coordX
      * @param int $coordY
      * @param string $state
-     * @return bool
+     * @return mixed
      */
     public static function createCell(int $fieldId, int $coordX, int $coordY,
                                       string $state)
@@ -120,7 +123,7 @@ class DatabaseHelper
             'state' => $state,
             'coordinate_x' => (string)$coordX,
             'coordinate_y' => (string)$coordY
-        ]);
+        ])->execute();
 
         $query=(new Query())
             ->select('id')
@@ -137,19 +140,23 @@ class DatabaseHelper
         return $id;
     }
 
+
     /**
      * @param int $gameId
      * @return array
      */
     public static function loadGame(int $gameId): array
     {
-        $query=self::$dbc->query("SELECT * FROM games WHERE id=".
-            (string)$gameId);
-        $result=$query->fetch();
+        $query=(new Query())
+            ->from('games')
+            ->where([
+                'id' => (string)$gameId
+            ])
+            ->one();
 
-        unset($query);
-        return $result;
+        return $query;
     }
+
 
     /**
      * @param int $playerId
@@ -157,84 +164,64 @@ class DatabaseHelper
      */
     public static function loadPlayer(int $playerId): string
     {
-        if(!isset(self::$dbc)){
-            return false;
-        }
+        $query=(new Query())
+            ->select('name')
+            ->from('players')
+            ->where([
+                'id' => (string)$playerId
+            ])
+            ->one();
 
-        $query=self::$dbc->query("SELECT name FROM players WHERE id=".
-            (string)$playerId);
-        $result=$query->fetch();
-
-        $name=$result['name'];
-        unset($result, $query);
+        $name=$query['name'];
+        unset($query);
         return $name;
     }
 
-    /**
-     * @param int $fieldId
-     * @param int $x
-     * @param int $y
-     * @return bool
-     */
+
     public static function loadCell(int $fieldId, int $x, int $y)
     {
-        if(!isset(self::$dbc)){
-            return false;
-        }
+        $query=(new Query())
+        ->from('cells')
+            ->where([
+                'field' => (string)$fieldId,
+                'coordinate_x' => (string)$x,
+                'coordinate_y' => (string)$y
+            ])
+            ->one();
 
-        $query=self::$dbc->query("SELECT * FROM cells WHERE field=".
-            (string)$fieldId." AND coordinate_x=".(string)$x." AND coordinate_y=".(string)$y);
-        $result=$query->fetch();
-
-        unset($query);
-        return $result;
+        return $query;
     }
 
-    /**
-     * @param int $cellId
-     * @param string $state
-     * @return bool
-     */
+
     public static function changeCellState(int $cellId, string $state)
     {
-        if(!isset(self::$dbc)){
-            return false;
-        }
-
-        self::$dbc->query("UPDATE cells SET state='${state}' WHERE id=".
-            (string)$cellId);
+        \Yii::$app->db->createCommand()->update('cells',
+            ['state' => $state], ['id' => (string)$cellId])->execute();
     }
 
-    /**
-     * @param int $fieldId
-     * @return bool|int
-     */
+
     public static function getShipsNum(int $fieldId)
     {
-        if(!isset(self::$dbc)){
-            return false;
-        }
-
-        $query=self::$dbc->query("SELECT * FROM cells WHERE field=".
-            (string)$fieldId." AND state='ship'");
-        $result=$query->fetchAll();
-        $shipsNum=count($result);
-        unset($query, $result);
-        return $shipsNum;
+        $query=(new Query())
+            ->select('COUNT(*)')
+            ->from('cells')
+            ->where([
+                'field' => (string)$fieldId,
+                'state' => Cell::SHIP_CELL_STATE
+            ])
+            ->scalar();
+        return $query;
     }
 
-    /**
-     * @param int $winnerId
-     * @param int $gameId
-     * @return bool
-     */
+
     public static function setWinnerAndTime(int $winnerId, int $gameId)
     {
-        if(!isset(self::$dbc)){
-            return false;
-        }
 
-        self::$dbc->query("UPDATE games SET winner=".(string)$winnerId." , end_timestamp=current_timestamp WHERE id=".
-            (string)$gameId);
+        \Yii::$app->db->createCommand()->update('games', [
+            'winner' => (string)$winnerId,
+            'end_timestamp' => 'current_timestamp'
+        ], [
+           'id' => (string)$gameId
+        ])->execute();
     }
 }
