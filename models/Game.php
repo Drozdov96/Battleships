@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use \app\controllers\DatabaseHelper;
 
 class Game
 {
@@ -44,7 +45,8 @@ class Game
         $idTwo=$this->playerTwo->getPlayerId();
 
         $this->gameId=DatabaseHelper::createGame($idOne, $idTwo);
-        $_SESSION['gameId']=$this->gameId;
+        \Yii::$app->session->open();
+        \Yii::$app->session->set('gameId', $this->gameId);
     }
 
     /**
