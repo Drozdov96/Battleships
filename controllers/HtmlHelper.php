@@ -11,31 +11,31 @@ class HtmlHelper
     public const MISS_CELL_CLASS_STRING='miss';
     public const HIDE_CELL_CLASS_STRING='hide';
 
-    /**
-     * @return string
-     */
-    public static function getPlayersNamePage(): string
-    {
-        return "<!DOCTYPE html>
-              <html>
-                <head>
-                    <meta charset=\"utf-8\"/>
-                    <title>Welcome!</title>
-                </head>
-                <body style=\"min-width: 1000px;\">
-                <h1>Enter player names</h1>
-                    <div style='width: 220px'>
-                     <form name='player_names' action=\"?state=setNames\" method=\"post\">
-                     <p>Player one:</p><br>
-                     <input type=\"text\" name=\"playerOneName\" required><br><br>
-                     <p>Player two:</p><br>
-                     <input type=\"text\" name='playerTwoName' required>
-                     <input type='submit' name='submit_btn' value='Confirm'>
-                     </form>
-                    </div>
-                </body>
-              </html>";
-    }
+//    /**
+//     * @return string
+//     */
+//    public static function getPlayersNamePage(): string
+//    {
+//        return "<!DOCTYPE html>
+//              <html>
+//                <head>
+//                    <meta charset=\"utf-8\"/>
+//                    <title>Welcome!</title>
+//                </head>
+//                <body style=\"min-width: 1000px;\">
+//                <h1>Enter player names</h1>
+//                    <div style='width: 220px'>
+//                     <form name='player_names' action=\"?state=setNames\" method=\"post\">
+//                     <p>Player one:</p><br>
+//                     <input type=\"text\" name=\"playerOneName\" required><br><br>
+//                     <p>Player two:</p><br>
+//                     <input type=\"text\" name='playerTwoName' required>
+//                     <input type='submit' name='submit_btn' value='Confirm'>
+//                     </form>
+//                    </div>
+//                </body>
+//              </html>";
+//    }
 
     /**
      * @param string $playerName
@@ -52,7 +52,7 @@ class HtmlHelper
                 <body style=\"min-width: 1000px;\">
                 <h1>Player ".$playerName." place ships on the field!</h1>
                     <div style='width: 220px'>
-                     <form name='play-field' action=\"?state=preparePhase\" method=\"post\">";
+                     <form name='play-field' action=\"?r=game/placementphase\" method=\"post\">";
         for ($i = 1; $i <= 10; $i++)
         {
             for ($j = 1; $j <= 10; $j++)
@@ -61,9 +61,7 @@ class HtmlHelper
             }
             $resultPageString.="<br>";
         }                   //нужно ли добавить условия проверки инициализации переменной
-        $resultPageString.="<input type=\"hidden\" name=\"player_one\" 
-            value=''>
-                    <input type=\"submit\" name=\"submit_btn_place\" 
+        $resultPageString.="<input type=\"submit\" name=\"submit_btn_place\" 
                         value=\"Confirm\" >
                 </form>
                     </div>
@@ -71,7 +69,8 @@ class HtmlHelper
               </html>";
         return $resultPageString;
     }
-
+//$resultPageString.="<input type=\"hidden\" name=\"player_one\"
+//value=''>
     /**
      * @param string $currentPlayer
      * @param array $friendlyField
@@ -97,7 +96,7 @@ class HtmlHelper
             $resultPageString.="<tr>";
             for ($j = 1; $j <= 10; $j++)
             {
-                $resultPageString.="<td><a href=\"index.php?x=".(string)$i."&y=".(string)$j."&state=doStep\" class='".
+                $resultPageString.="<td><a href=\"?r=game/dostep&x=".(string)$i."&y=".(string)$j."&state=doStep\" class='".
                     Helper::getEnemyClass($i, $j, $enemyField)."'>&nbsp;</a></td>";
             }
             $resultPageString.="</tr>";

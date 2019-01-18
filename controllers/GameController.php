@@ -89,7 +89,7 @@ class GameController extends Controller
             'fieldTwo' => $this->game->getFieldTwo()]);
     }
 
-    protected function doStep(string $x, string $y)
+    protected function actionDoStep(string $x, string $y)
     {
         $this->game->doStep($x, $y);
 
