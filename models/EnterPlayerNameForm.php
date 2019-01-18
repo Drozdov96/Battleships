@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: user
- * Date: 14.01.19
- * Time: 15:04
- */
 
 namespace app\models;
 
@@ -13,7 +7,13 @@ use yii\base\Model;
 
 class EnterPlayerNameForm extends Model
 {
+    /**
+     * @var string
+     */
     public $playerOneName;
+    /**
+     * @var string
+     */
     public $playerTwoName;
 
     public function rules()

@@ -1,5 +1,7 @@
 <?php
 
+/* @var $model app\models\EnterPlayerNameForm */
+
 use yii\helpers\Html;
 ?>
 <p>Вы ввели следующую информацию:</p>

@@ -10,8 +10,10 @@ use yii\base\Module;
 
 class GameController extends Controller
 {
+    /**
+     * @var Game
+     */
     protected $game;
-    public const NEW_GAME_NUM=-1;
 
     public function __construct($id, Module $module, array $config = [])
     {
@@ -32,98 +34,89 @@ class GameController extends Controller
 
             // делаем что-то полезное с $model ...
 
-            return $this->render('entry-confirm', ['model' => $model]);
+            $this->createGame($model->playerOneName, $model->playerTwoName);
+            return $this->actionPlacementPhase();
         } else {
             // либо страница отображается первый раз, либо есть ошибка в данных
             return $this->render('index', ['model' => $model]);
         }
     }
 
-//    protected function runPlacementPhase()
-//    {
-//        if(isset($_POST['submit_btn_place'])) {
-//            if($this->game->fieldEmpty(Game::FIELD_ONE_NUM)) {
-//                if (Helper::verifyInputFieldArray($_POST)){
-//                    $this->game->setField(Game::FIELD_ONE_NUM, Helper::convertFieldArrayToString($_POST));
-//                    echo HtmlHelper::getShipsPlacementPage($this->game->playerTwo->playerName);
-//                }else{
-//                    echo HtmlHelper::getShipsPlacementPage($this->game->playerOne->playerName);
-//                }
-//            }else{
-//                if (Helper::verifyInputFieldArray($_POST)){
-//                    $this->game->setField(Game::FIELD_TWO_NUM, Helper::convertFieldArrayToString($_POST));
-//                    header("Refresh:0; url=index.php?state=startGame");
-//                    exit;
-//                }else{
-//                    echo HtmlHelper::getShipsPlacementPage($this->game->playerTwo->playerName);
-//                }
-//            }
-//        }else{
-//            echo HtmlHelper::getShipsPlacementPage($this->game->playerOne->playerName);
-//        }
-//    }
-//
-//    protected function createGame(string $playerOne, string $playerTwo)
-//    {
-//        $this->game=new Game();
-//        $this->game->createGame($playerOne, $playerTwo);
-//        header("Refresh:0; url=index.php?state=preparePhase");
-//        exit;
-//    }
-//
-//    protected function runSetNamesPhase()
-//    {
-//        echo HtmlHelper::getPlayersNamePage();
-//    }
-//
-//    protected function runGame()
-//    {
-//        $_SESSION['currentPlayerNum']=Game::PLAYER_ONE_NUM;
-//        echo HtmlHelper::getGamePage($this->game->playerOne->playerName,
-//            $this->game->getFieldOne(), $this->game->getFieldTwo());
-//    }
-//
-//    protected function doStep(string $x, string $y)
-//    {
-//        $this->game->doStep($x, $y);
-//
-//        if($this->game->checkEndGame($_SESSION['currentPlayerNum'])){
-//            unset($_SESSION['gameId']);
-//            if($_SESSION['currentPlayerNum']===Game::PLAYER_ONE_NUM){
-//                echo HtmlHelper::getEndGamePage($this->game->playerOne->playerName);
-//            }else{
-//                echo HtmlHelper::getEndGamePage($this->game->playerTwo->playerName);
-//            }
-//        }elseif($_SESSION['currentPlayerNum']===Game::PLAYER_ONE_NUM){
-//            echo HtmlHelper::getGamePage($this->game->playerOne->playerName,
-//                $this->game->getFieldOne(), $this->game->getFieldTwo());
-//        }else{
-//            echo HtmlHelper::getGamePage($this->game->playerTwo->playerName,
-//                $this->game->getFieldTwo(),$this->game->getFieldOne());
-//        }
-//    }
-//
-//    /**
-//     * @param string $state
-//     */
-//    public function doRoute(string $state)
-//    {
-//        switch ($state){
-//            case 'preparePhase':
-//                $this->runPlacementPhase();
-//                break;
-//            case 'startGame':
-//                $this->runGame();
-//                break;
-//            case 'doStep':
-//                $this->doStep($_GET['x'], $_GET['y']);
-//                unset($_GET['x'], $_GET['y']);
-//                break;
-//            case 'setNames':
-//                $this->createGame($_POST['playerOneName'], $_POST['playerTwoName']);
-//                break;
-//            default:
-//                $this->runSetNamesPhase();
-//        }
-//    }
+    public function actionPlacementPhase()
+    {
+        $postArr=Yii::$app->request->post();
+        if(!empty(Yii::$app->request->post('submit_btn_place'))) {
+            if($this->game->fieldEmpty(Game::FIELD_ONE_NUM)) {
+                if (Helper::verifyInputFieldArray($postArr)){
+                    $this->game->setField(Game::FIELD_ONE_NUM,
+                        Helper::convertFieldArrayToString($postArr));
+
+                    return $this->render('placementPhase',
+                        ['playerName' => $this->game->playerTwo->playerName]);
+                }else{
+                    return $this->render('placementPhase',
+                        ['playerName' => $this->game->playerOne->playerName]);
+                }
+            }else{
+                if (Helper::verifyInputFieldArray($postArr)){
+                    $this->game->setField(Game::FIELD_TWO_NUM,
+                        Helper::convertFieldArrayToString($postArr));
+
+                    return $this->runGame();
+                }else{
+                    return $this->render('placementPhase',
+                        ['playerName' => $this->game->playerTwo->playerName]);
+                }
+            }
+        }else{
+            return $this->render('placementPhase',
+                ['playerName' => $this->game->playerOne->playerName]);
+        }
+    }
+
+    protected function createGame(string $playerOne, string $playerTwo)
+    {
+        $this->game=new Game();
+        $this->game->createGame($playerOne, $playerTwo);
+    }
+
+    protected function runGame()
+    {
+        Yii::$app->session->set('currentPlayerNum', Game::PLAYER_ONE_NUM);
+        return $this->render('game', [
+            'playerName' => $this->game->playerOne->playerName,
+            'fieldOne' => $this->game->getFieldOne(),
+            'fieldTwo' => $this->game->getFieldTwo()]);
+    }
+
+    protected function doStep(string $x, string $y)
+    {
+        $this->game->doStep($x, $y);
+
+        $currentPlayerNum= Yii::$app->session->get('currentPlayerNum');
+
+        if($this->game->checkEndGame($currentPlayerNum)){
+            unset($_SESSION['gameId']);
+            if($currentPlayerNum===Game::PLAYER_ONE_NUM){
+                return $this->render('endGame', [
+                    'playerName' => $this->game->playerOne->playerName
+                ]);
+            }else{
+                return $this->render('endGame', [
+                    'playerName' => $this->game->playerTwo->playerName
+                ]);
+            }
+        }elseif($currentPlayerNum===Game::PLAYER_ONE_NUM){
+            return $this->render('game', [
+                'playerName' => $this->game->playerOne->playerName,
+                'fieldOne' => $this->game->getFieldOne(),
+                'fieldTwo' => $this->game->getFieldTwo()]);
+        }else{
+            return $this->render('game', [
+                'playerName' => $this->game->playerOne->playerName,
+                'fieldOne' => $this->game->getFieldTwo(),
+                'fieldTwo' => $this->game->getFieldOne()]);
+        }
+    }
+
 }

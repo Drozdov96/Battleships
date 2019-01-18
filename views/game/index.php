@@ -1,5 +1,7 @@
 <?php
 
+/* @var $model app\models\EnterPlayerNameForm */
+
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 ?>
