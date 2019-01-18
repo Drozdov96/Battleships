@@ -89,8 +89,16 @@ class GameController extends Controller
             'fieldTwo' => $this->game->getFieldTwo()]);
     }
 
-    protected function actionDoStep(string $x, string $y)
+    /**
+     * @var $x string
+     * @var $y string
+     * @return string
+     */
+    public function actionDoStep()
     {
+        $x=Yii::$app->request->get('x');
+        $y=Yii::$app->request->get('y');
+
         $this->game->doStep($x, $y);
 
         $currentPlayerNum= Yii::$app->session->get('currentPlayerNum');

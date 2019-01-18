@@ -216,12 +216,8 @@ class DatabaseHelper
 
     public static function setWinnerAndTime(int $winnerId, int $gameId)
     {
-
-        \Yii::$app->db->createCommand()->update('games', [
-            'winner' => (string)$winnerId,
-            'end_timestamp' => 'current_timestamp'
-        ], [
-           'id' => (string)$gameId
-        ])->execute();
+        \Yii::$app->db->createCommand('UPDATE games SET winner='
+            .(string)$winnerId.', end_timestamp=current_timestamp 
+            WHERE id='.(string)$gameId)->execute();
     }
 }

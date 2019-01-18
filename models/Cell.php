@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\controllers\DatabaseHelper;
+
 class Cell
 {
     /*

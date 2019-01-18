@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use app\controllers\Helper;
+use app\controllers\{Helper, DatabaseHelper};
 
 class Field
 {

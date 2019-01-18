@@ -8,8 +8,8 @@ class HtmlHelper
     public const EMPTY_CELL_CLASS_STRING='emptyCell';
     public const BREAK_SHIP_CLASS_STRING='breakShipCell';
     public const SHIP_CLASS_STRING='ship';
-    public const MISS_CELL_CLASS_STRING='miss';
-    public const HIDE_CELL_CLASS_STRING='hide';
+    public const MISS_CELL_CLASS_STRING='missShip';
+    public const HIDE_CELL_CLASS_STRING='hideShip';
 
 //    /**
 //     * @return string
@@ -52,7 +52,7 @@ class HtmlHelper
                 <body style=\"min-width: 1000px;\">
                 <h1>Player ".$playerName." place ships on the field!</h1>
                     <div style='width: 220px'>
-                     <form name='play-field' action=\"?r=game/placementphase\" method=\"post\">";
+                     <form name='play-field' action=\"./index.php?r=game%2Fplacement-phase\" method=\"post\">";
         for ($i = 1; $i <= 10; $i++)
         {
             for ($j = 1; $j <= 10; $j++)
@@ -60,8 +60,10 @@ class HtmlHelper
                 $resultPageString.="<input type=\"checkbox\" name=\"".(string)$i."-".(string)$j."\" value='".self::CELL_WITH_SHIP_STRING."'>";
             }
             $resultPageString.="<br>";
-        }                   //нужно ли добавить условия проверки инициализации переменной
-        $resultPageString.="<input type=\"submit\" name=\"submit_btn_place\" 
+        }
+        $resultPageString.=
+                "<input type=\"hidden\" name=\"_csrf\" value=\"".\Yii::$app->request->getCsrfToken()."\" />
+                <input type=\"submit\" name=\"submit_btn_place\" 
                         value=\"Confirm\" >
                 </form>
                     </div>
@@ -96,7 +98,7 @@ class HtmlHelper
             $resultPageString.="<tr>";
             for ($j = 1; $j <= 10; $j++)
             {
-                $resultPageString.="<td><a href=\"?r=game/dostep&x=".(string)$i."&y=".(string)$j."&state=doStep\" class='".
+                $resultPageString.="<td><a href=\"./index.php?r=game/do-step&x=".(string)$i."&y=".(string)$j."\" class='".
                     Helper::getEnemyClass($i, $j, $enemyField)."'>&nbsp;</a></td>";
             }
             $resultPageString.="</tr>";
