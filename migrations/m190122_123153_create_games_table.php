@@ -22,21 +22,25 @@ class m190122_123153_create_games_table extends Migration
             'end_timestamp' => $this->timestamp()
         ]);
 
-        $this->addForeignKey(
-            'fk-games-players',
-            'games',
-            ['player_one', 'player_two', 'winner'],
-            'players',
-            'id'
-        );
+        foreach (['player_one', 'player_two', 'winner'] as $column){
+            $this->addForeignKey(
+                'fk-games-'.$column,
+                'games',
+                $column,
+                'players',
+                'id'
+            );
+        }
 
-        $this->addForeignKey(
-            'fk-games-fields',
-            'games',
-            ['field_one', 'field_two'],
-            'fields',
-            'id'
-        );
+        foreach (['field_one', 'field_two'] as $column){
+            $this->addForeignKey(
+                'fk-games-'.$column,
+                'games',
+                $column,
+                'fields',
+                'id'
+            );
+        }
     }
 
     /**
