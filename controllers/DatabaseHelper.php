@@ -220,4 +220,14 @@ class DatabaseHelper
             .(string)$winnerId.', end_timestamp=current_timestamp 
             WHERE id='.(string)$gameId)->execute();
     }
+
+    public static function getPlayerForId(int $id)
+    {
+        $query=(new Query())
+            ->from('players')
+            ->where(['id' => $id])
+            ->one();
+
+        return $query;
+    }
 }
