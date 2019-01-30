@@ -230,4 +230,24 @@ class DatabaseHelper
 
         return $query;
     }
+
+    public static function getPlayerIdByToken(string $token)
+    {
+        $query=(new Query())
+            ->from('players')
+            ->where(['accesstoken' => $token])
+            ->one();
+
+        return $query;
+    }
+
+    public static function getPlayerIdByName(string $name)
+    {
+        $query=(new Query())
+            ->from('players')
+            ->where(['name' => $name])
+            ->one();
+
+        return $query;
+    }
 }
